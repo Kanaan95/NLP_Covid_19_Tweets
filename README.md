@@ -6,7 +6,7 @@ There are 3 files in the project folder:
 
 - `__main__.py`: Main source file
 - `Twitter.py`: Handles all Twitter connections and commands
-- `cred.py`: Contains credentials for Twitter API connection
+- `creds.py`: Contains credentials for Twitter API connection
 - `requirement.txt`: List of python modules that we need to install
 
 ## About this program
@@ -75,6 +75,12 @@ pip install -r requirement.txt
 ```
 
 **Note**: Be sure you're in the project’s directory folder, otherwise the command will throw an error
+
+## Credentials
+
+In order to use Tweepy, you need to have a Twitter developer account. Below is the Twitter terminology in case of any confusion with the Tweepy docs
+
+![terminology](images/Twitter_Terminology.png)
 
 ## Executing the program
 
