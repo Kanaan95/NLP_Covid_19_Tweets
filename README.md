@@ -6,7 +6,7 @@ There are 3 files in the project folder:
 
 - `__main__.py`: Main source file
 - `Twitter.py`: Handles all Twitter connections and commands
-- `creds.py`: Contains credentials for Twitter API connection
+- `credentials.py`: Contains credentials for Twitter API connection
 - `requirement.txt`: List of python modules that we need to install
 
 ## About this program
