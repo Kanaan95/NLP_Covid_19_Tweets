@@ -1,6 +1,6 @@
 from tweepy.streaming import StreamListener
 from tweepy import OAuthHandler, Stream, API
-import credentials as creds
+import creds
 import numpy as np
 import pandas as pd
 import json
@@ -33,7 +33,7 @@ class TwitterStream():
     def __init__(self):
         pass
 
-    def stream_tweets(self, fetched_tweets_filename, detailed_tweets, hash_tag_list, df, csv_path):
+    def stream_tweets(self, fetched_tweets_filename, dataf, path, hash_tag_list):
         '''
         Creates and launch the stream to capture live tweets and store them
 
@@ -44,31 +44,30 @@ class TwitterStream():
                     df (Pandas Dataframe): dataframe to store the general info tweets
                     csv_path: path to store the csv
         '''
-        listener = StdOutListener(fetched_tweets_filename, detailed_tweets, df, csv_path)
+        listener = StdOutListener(fetched_tweets_filename, dataf, path)
         auth = TwitterAuthenticator().get_auth()
         stream = Stream(auth, listener)
 
-        stream.filter(languages=["en"], is_async = True, track=hash_tag_list)
+        stream.filter(languages=["en","fr", "es", "pt", "ar"], track=hash_tag_list)
 
 
 class StdOutListener(StreamListener):
     """
     This is a basic listener that just prints received tweets to stdout.
     """
-    def __init__(self, fetched_tweets_filename, detailed_tweets, df, path):
+    def __init__(self, fetched_tweets_filename, dataf, path):
         super(StdOutListener, self).__init__()
         self.fetched_tweets_filename = fetched_tweets_filename
-        self.detailed_tweets = detailed_tweets
-        self.dataframe = df
+        self.dataf = dataf
         self.path = path
 
     def on_status(self, status):
 
         # Store Full tweet
-        with open(self.detailed_tweets, 'a', encoding="utf-8") as tf1:
-                tf1.write(json.dumps(status._json))
-                tf1.write("\n,")
-                tf1.write("\n")
+        # with open("D:\\Twitter_Data_Vaccines\\test.txt", 'a', encoding="utf-8") as tf1:
+        #         tf1.write(json.dumps(status._json))
+        #         tf1.write("\n,")
+        #         tf1.write("\n")
 
         tweet = {
             "id": status.id,
@@ -82,7 +81,8 @@ class StdOutListener(StreamListener):
             "user_verified": status.user.verified,
             "date": status.created_at,
             "source": status.source,
-            "is_retweet": status.retweeted
+            "is_retweet": status.retweeted,
+            "language": status.lang
         }
 
         if hasattr(status, "retweeted_status"):  # Check if Retweet
@@ -99,14 +99,17 @@ class StdOutListener(StreamListener):
             except AttributeError:
                 tweet["text"] = status.text
                 tweet["hashtags"] = status.entities["hashtags"]
+        
+        if not tweet["hashtags"]:
+            tweet["hashtags"] = np.nan
 
         with open(self.fetched_tweets_filename, 'a') as tf:
                 tf.write(json.dumps(tweet, sort_keys= True, default = lambda o : o.__str__() if isinstance(o, datetime.datetime) else o))
-                tf.write(",")
+                # tf.write(",")
                 tf.write("\n")
 
-        self.dataframe = self.dataframe.append(tweet, ignore_index = True)
-        self.dataframe.to_csv(self.path, encoding="utf-8", index=False)
+        # self.dataf = self.dataf.append(tweet, ignore_index = True)
+        # self.dataf.to_csv(self.path, encoding="utf-8", index=False)
 
         return True
 
